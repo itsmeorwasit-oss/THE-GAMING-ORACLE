@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gaming Oracle</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Impact, sans-serif;
+            background: #07070a;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background: linear-gradient(145deg, #0f101b, #171926);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 40px rgba(0, 255, 204, 0.15);
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            border: 2px solid #2e334a;
+        }
+        h1 {
+            color: #00ffcc;
+            margin-bottom: 5px;
+            font-size: 2.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+        }
+        .credits {
+            color: #ff007f;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .subtitle {
+            color: #767fa3;
+            margin-bottom: 35px;
+            font-size: 1.1rem;
+        }
+        .progress {
+            font-size: 1.1rem;
+            color: #ff007f;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .question {
+            font-size: 1.6rem;
+            margin-bottom: 35px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+        @media(max-width: 800px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media(max-width: 500px) {
+            .options-grid { grid-template-columns: 1fr; }
+        }
+        button {
+            background: #1a1c29;
+            color: #e2e8f0;
+            border: 2px solid #3b4261;
+            padding: 14px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        button:hover {
+            background: #ff007f;
+            color: #fff;
+            border-color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 0, 127, 0.4);
+        }
+        .btn-center {
+            grid-column: 1 / -1;
+            max-width: 300px;
+            margin: 20px auto 0 auto;
+            width: 100%;
+            padding: 18px;
+            font-size: 1.3rem;
+        }
+        .btn-right {
+            background: #00ffcc;
+            color: #000;
+            border-color: #00ffcc;
+        }
+        .btn-right:hover {
+            background: #00ccaa;
+            color: #000;
+            box-shadow: 0 0 25px rgba(0, 255, 204, 0.7);
+        }
+        .btn-wrong {
+            background: #ff3333;
+            color: #fff;
+            border-color: #ff3333;
+        }
+        .btn-wrong:hover {
+            background: #cc2222;
+            box-shadow: 0 0 25px rgba(255, 51, 51, 0.7);
+        }
+        .game-display {
+            font-size: 3.8rem;
+            color: #00ffcc;
+            margin: 30px 0;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-shadow: 0 0 25px rgba(0, 255, 204, 0.5);
+        }
+        .tracker {
+            color: #51587d;
+            font-size: 0.9rem;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card" id="game-card">
+    <h1>The Gaming Oracle</h1>
+    <div class="credits">Made by Thegamemaster09</div>
+    <p class="subtitle">15 targeted questions. 15 precise gaming answers each. Let's find your ultimate game.</p>
+    <div class="options-grid">
+        <button class="btn-center" onclick="startGame()">Boot Matrix</button>
+    </div>
+</div>
+
+<script>
+const gamesDatabase = [
+    { name: "Minecraft", tags: ["sandbox", "chill", "first-person", "building", "pixel", "survival"] },
+    { name: "Grand Theft Auto V", tags: ["open-world", "sweaty", "third-person", "guns", "crime", "modern"] },
+    { name: "The Legend of Zelda: Breath of the Wild", tags: ["open-world", "chill", "third-person", "swords", "nintendo", "fantasy"] },
+    { name: "The Legend of Zelda: Tears of the Kingdom", tags: ["open-world", "chill", "third-person", "building", "nintendo", "fantasy"] },
+    { name: "Elden Ring", tags: ["rpg", "sweaty", "third-person", "swords", "brutal", "fantasy"] },
+    { name: "The Witcher 3: Wild Hunt", tags: ["rpg", "chill", "third-person", "swords", "story", "fantasy"] },
+    { name: "Cyberpunk 2077", tags: ["rpg", "chill", "first-person", "guns", "sci-fi", "modern"] },
+    { name: "Valorant", tags: ["fps", "sweaty", "first-person", "guns", "tactical", "multiplayer"] },
+    { name: "Counter-Strike 2", tags: ["fps", "sweaty", "first-person", "guns", "tactical", "multiplayer"] },
+    { name: "Fortnite", tags: ["fps", "sweaty", "third-person", "building", "br", "multiplayer"] },
+    { name: "Apex Legends", tags: ["fps", "sweaty", "first-person", "guns", "br", "multiplayer"] },
+    { name: "League of Legends", tags: ["moba", "sweaty", "isometric", "strategy", "clicker", "multiplayer"] },
+    { name: "Dota 2", tags: ["moba", "sweaty", "isometric", "strategy", "clicker", "multiplayer"] },
+    { name: "Overwatch 2", tags: ["fps", "sweaty", "first-person", "guns", "hero", "multiplayer"] },
+    { name: "Red Dead Redemption 2", tags: ["open-world", "chill", "third-person", "guns", "story", "historical"] },
+    { name: "Stardew Valley", tags: ["cozy", "chill", "isometric", "pixel", "farming", "indie"] },
+    { name: "Animal Crossing: New Horizons", tags: ["cozy", "chill", "third-person", "nintendo", "farming", "casual"] },
+    { name: "Hades", tags: ["roguelike", "sweaty", "isometric", "swords", "indie", "fantasy"] },
+    { name: "Hades II", tags: ["roguelike", "sweaty", "isometric", "swords", "indie", "fantasy"] },
+    { name: "Baldur's Gate 3", tags: ["rpg", "chill", "isometric", "story", "turn-based", "fantasy"] },
+    { name: "Rocket League", tags: ["sports", "sweaty", "third-person", "cars", "competitive", "multiplayer"] },
+    { name: "Roblox", tags: ["sandbox", "chill", "third-person", "building", "multiplayer", "casual"] },
+    { name: "Call of Duty: Warzone", tags: ["fps", "sweaty", "first-person", "guns", "br", "multiplayer"] },
+    { name: "Call of Duty: Modern Warfare", tags: ["fps", "sweaty", "first-person", "guns", "multiplayer", "modern"] },
+    { name: "Genshin Impact", tags: ["rpg", "chill", "third-person", "anime", "gacha", "fantasy"] },
+    { name: "Honkai: Star Rail", tags: ["rpg", "chill", "third-person", "anime", "turn-based", "sci-fi"] },
+    { name: "Terraria", tags: ["sandbox", "chill", "isometric", "pixel", "survival", "indie"] },
+    { name: "Among Us", tags: ["party", "chill", "isometric", "indie", "multiplayer", "sci-fi"] },
+    { name: "Portal 2", tags: ["puzzle", "chill", "first-person", "sci-fi", "story", "indie"] },
+    { name: "Portal", tags: ["puzzle", "chill", "first-person", "sci-fi", "singleplayer", "indie"] },
+    { name: "Skyrim", tags: ["rpg", "chill", "first-person", "swords", "open-world", "fantasy"] },
+    { name: "Fallout 4", tags: ["rpg", "chill", "first-person", "guns", "open-world", "sci-fi"] },
+    { name: "Fallout: New Vegas", tags: ["rpg", "chill", "first-person", "guns", "story", "sci-fi"] },
+    { name: "Hollow Knight", tags: ["metroidvania", "sweaty", "isometric", "pixel", "indie", "brutal"] },
+    { name: "Dark Souls III", tags: ["rpg", "sweaty", "third-person", "swords", "brutal", "fantasy"] },
+    { name: "Dark Souls", tags: ["rpg", "sweaty", "third-person", "swords", "brutal", "fantasy"] },
+    { name: "Bloodborne", tags: ["rpg", "sweaty", "third-person", "swords", "brutal", "horror"] },
+    { name: "Sekiro: Shadows Die Twice", tags: ["rpg", "sweaty", "third-person", "swords", "brutal", "historical"] },
+    { name: "Ghost of Tsushima", tags: ["open-world", "chill", "third-person", "swords", "story", "historical"] },
+    { name: "Spider-Man 2", tags: ["open-world", "chill", "third-person", "superhero", "story", "modern"] },
+    { name: "Marvel's Spider-Man", tags: ["open-world", "chill", "third-person", "superhero", "story", "modern"] },
+    { name: "God of War (2018)", tags: ["rpg", "chill", "third-person", "swords", "story", "fantasy"] },
+    { name: "God of War Ragnarok", tags: ["rpg", "chill", "third-person", "swords", "story", "fantasy"] },
+    { name: "The Last of Us Part I", tags: ["rpg", "chill", "third-person", "guns", "story", "horror"] },
+    { name: "The Last of Us Part II", tags: ["rpg", "chill", "third-person", "guns", "story", "horror"] },
+    { name: "Horizon Zero Dawn", tags: ["open-world", "chill", "third-person", "guns", "sci-fi", "story"] },
+    { name: "Horizon Forbidden West", tags: ["open-world", "chill", "third-person", "guns", "sci-fi", "story"] },
+    { name: "Monster Hunter: World", tags: ["rpg", "sweaty", "third-person", "swords", "multiplayer", "fantasy"] },
+    { name: "Monster Hunter: Rise", tags: ["rpg", "sweaty", "third-person", "swords", "multiplayer", "fantasy"] },
+    { name: "Destiny 2", tags: ["fps", "sweaty", "first-person", "guns", "sci-fi", "multiplayer"] },
+    { name: "Warframe", tags: ["rpg", "sweaty", "third-person", "guns", "sci-fi", "multiplayer"] },
+    { name: "Helldivers 2", tags: ["fps", "sweaty", "third-person", "guns", "multiplayer", "sci-fi"] },
+    { name: "Left 4 Dead 2", tags: ["fps", "chill", "first-person", "guns", "multiplayer", "horror"] },
+    { name: "Dead by Daylight", tags: ["party", "sweaty", "third-person", "horror", "multiplayer", "competitive"] },
+    { name: "Phasmophobia", tags: ["party", "chill", "first-person", "horror", "multiplayer", "indie"] },
+    { name: "Resident Evil 4", tags: ["rpg", "chill", "third-person", "guns", "horror", "story"] },
+    { name: "Resident Evil Village", tags: ["rpg", "chill", "first-person", "guns", "horror", "story"] },
+    { name: "Subnautica", tags: ["sandbox", "chill", "first-person", "survival", "horror", "indie"] },
+    { name: "The Forest", tags: ["sandbox", "chill", "first-person", "survival", "multiplayer", "horror"] },
+    { name: "Sons of the Forest", tags: ["sandbox", "chill", "first-person", "survival", "multiplayer", "horror"] },
+    { name: "Rust", tags: ["sandbox", "sweaty", "first-person", "survival", "guns", "multiplayer"] },
+    { name: "ARK: Survival Evolved", tags: ["sandbox", "sweaty", "first-person", "survival", "multiplayer", "sci-fi"] },
+    { name: "Sea of Thieves", tags: ["open-world", "chill", "first-person", "multiplayer", "guns", "casual"] },
+    { name: "No Man's Sky", tags: ["open-world", "chill", "first-person", "sci-fi", "survival", "sandbox"] },
+    { name: "Starfield", tags: ["rpg", "chill", "first-person", "sci-fi", "guns", "open-world"] },
+    { name: "Mass Effect Legendary Edition", tags: ["rpg", "chill", "third-person", "sci-fi", "story", "singleplayer"] },
+    { name: "Outer Wilds", tags: ["puzzle", "chill", "first-person", "sci-fi", "story", "indie"] },
+    { name: "Undertale", tags: ["rpg", "chill", "isometric", "pixel", "story", "indie"] },
+    { name: "Deltarune", tags: ["rpg", "chill", "isometric", "pixel", "story", "indie"] },
+    { name: "Omori", tags: ["rpg", "chill", "isometric", "pixel", "story", "indie"] },
+    { name: "Celeste", tags: ["platformer", "sweaty", "isometric", "pixel", "indie", "brutal"] },
+    { name: "Super Mario Odyssey", tags: ["platformer", "chill", "third-person", "nintendo", "building", "casual"] },
+    { name: "Super Mario Bros. Wonder", tags: ["platformer", "chill", "isometric", "nintendo", "multiplayer", "casual"] },
+    { name: "Super Smash Bros. Ultimate", tags: ["fighting", "sweaty", "isometric", "nintendo", "multiplayer", "competitive"] },
+    { name: "Street Fighter 6", tags: ["fighting", "sweaty", "isometric", "competitive", "multiplayer", "modern"] },
+    { name: "Tekken 8", tags: ["fighting", "sweaty", "third-person", "competitive", "multiplayer", "modern"] },
+    { name: "Mortal Kombat 1", tags: ["fighting", "sweaty", "isometric", "competitive", "multiplayer", "modern"] },
+    { name: "Guilty Gear Strive", tags: ["fighting", "sweaty", "isometric", "anime", "multiplayer", "competitive"] },
+    { name: "The Sims 4", tags: ["cozy", "chill", "isometric", "building", "farming", "casual"] },
+    { name: "Cities: Skylines", tags: ["strategy", "chill", "isometric", "building", "strategy", "casual"] },
+    { name: "Civilization VI", tags: ["strategy", "chill", "isometric", "turn-based", "strategy", "historical"] },
+    { name: "Hearts of Iron IV", tags: ["strategy", "sweaty", "isometric", "turn-based", "strategy", "historical"] },
+    { name: "Crusader Kings III", tags: ["strategy", "chill", "isometric", "turn-based", "story", "historical"] },
+    { name: "Total War: Warhammer III", tags: ["strategy", "sweaty", "isometric", "turn-based", "swords", "fantasy"] },
+    { name: "RimWorld", tags: ["strategy", "chill", "isometric", "pixel", "survival", "indie"] },
+    { name: "Factorio", tags: ["strategy", "sweaty", "isometric", "pixel", "building", "indie"] },
+    { name: "Satisfactory", tags: ["sandbox", "chill", "first-person", "building", "sci-fi", "indie"] },
+    { name: "Slay the Spire", tags: ["roguelike", "chill", "isometric", "turn-based", "indie", "strategy"] },
+    { name: "The Binding of Isaac: Rebirth", tags: ["roguelike", "sweaty", "isometric", "pixel", "indie", "brutal"] },
+    { name: "Dead Cells", tags: ["roguelike", "sweaty", "isometric", "pixel", "indie", "brutal"] },
+    { name: "Vampire Survivors", tags: ["roguelike", "chill", "isometric", "pixel", "clicker", "indie"] },
+    { name: "Lethal Company", tags: ["party", "chill", "first-person", "horror", "indie", "multiplayer"] },
+    { name: "Deep Rock Galactic", tags: ["fps", "chill", "first-person", "guns", "multiplayer", "sci-fi"] },
+    { name: "Borderlands 3", tags: ["fps", "chill", "first-person", "guns", "sci-fi", "story"] },
+    { name: "Payday 2", tags: ["fps", "chill", "first-person", "guns", "crime", "multiplayer"] },
+    { name: "Tom Clancy's Rainbow Six Siege", tags: ["fps", "sweaty", "first-person", "guns", "tactical", "multiplayer"] },
+    { name: "Escape from Tarkov", tags: ["fps", "sweaty", "first-person", "guns", "tactical", "survival"] },
+    { name: "DayZ", tags: ["sandbox", "sweaty", "first-person", "survival", "horror", "multiplayer"] },
+    { name: "Project Zomboid", tags: ["sandbox", "sweaty", "isometric", "survival", "horror", "indie"] },
+    { name: "Diablo IV", tags: ["rpg", "sweaty", "isometric", "swords", "clicker", "fantasy"] },
+    { name: "Path of Exile", tags: ["rpg", "sweaty", "isometric", "swords", "clicker", "fantasy"] },
+    { name: "World of Warcraft", tags: ["rpg", "sweaty", "third-person", "multiplayer", "swords", "fantasy"] },
+    { name: "Final Fantasy XIV", tags: ["rpg", "chill", "third-person", "story", "anime", "fantasy"] },
+    { name: "Final Fantasy VII Rebirth", tags: ["rpg", "chill", "third-person", "story", "anime", "fantasy"] },
+    { name: "Persona 5 Royal", tags: ["rpg", "chill", "third-person", "turn-based", "anime", "story"] },
+    { name: "Yakuza: Like a Dragon", tags: ["rpg", "chill", "third-person", "turn-based", "story", "modern"] }
+];
+
+const questions = [
+    {
+        q: "What is your absolute core gaming vibe?",
+        options: [
+            { text: "Pure Competitive Sweating", tag: "sweaty" }, { text: "Chill, Casual, and Relaxing", tag: "chill" },
+            { text: "Grinding Ranked Leaderboards", tag: "sweaty" }, { text: "Cozy Farming or Vibing", tag: "cozy" },
+            { text: "Immersive Singleplayer Story", tag: "story" }, { text: "Endless Modding & Sandboxes", tag: "sandbox" },
+            { text: "Dying constantly in Roguelikes", tag: "roguelike" }, { text: "Playing with Squad / Friends", tag: "multiplayer" },
+            { text: "Big Brain Strategy & Maps", tag: "strategy" }, { text: "Fast reflex Fighting / Combos", tag: "fighting" },
+            { text: "Exploring massive Open-Worlds", tag: "open-world" }, { text: "Unlocking rare RPG armor & stats", tag: "rpg" },
+            { text: "Screaming in Terror with Co-op", tag: "horror" }, { text: "Quick Match Arena Shooters", tag: "fps" },
+            { text: "Just killing time casually", tag: "casual" }
+        ]
+    },
+    {
+        q: "Pick the camera angle or movement layout you play on most:",
+        options: [
+            { text: "First-Person / Through the eyes", tag: "first-person" }, { text: "Third-Person / Over-the-shoulder", tag: "third-person" },
+            { text: "Top-Down Isometric map tracking", tag: "isometric" }, { text: "2D Side-scrolling pixel layouts", tag: "pixel" },
+            { text: "Fixed Overhead Strategy grids", tag: "strategy" }, { text: "3D Platforming and manual jumps", tag: "platformer" },
+            { text: "Aiming down sights (ADS) 24/7", tag: "fps" }, { text: "Free camera to rotate character", tag: "third-person" },
+            { text: "Point and click mouse tracking", tag: "clicker" }, { text: "Flat 2D Fighting game layout", tag: "fighting" },
+            { text: "Grid-based movement tiles", tag: "turn-based" }, { text: "Driving / cockpit view physics", tag: "cars" },
+            { text: "First-person but in dark caves", tag: "horror" }, { text: "Looking down at a tiny city grid", tag: "building" },
+            { text: "I switch between 1st and 3rd person", tag: "open-world" }
+        ]
+    },
+    {
+        q: "What item or interaction style describes your gameplay?",
+        options: [
+            { text: "Customizing weapon attachments & triggers", tag: "guns" }, { text: "Swinging massive blades & swords", tag: "swords" },
+            { text: "Placing blocks & building structures", tag: "building" }, { text: "Planting crops and selling turnips", tag: "farming" },
+            { text: "Managing skill trees & custom stats", tag: "rpg" }, { text: "Casting magic spells and mana bars", tag: "fantasy" },
+            { text: "Clicking resources as fast as possible", tag: "clicker" }, { text: "Looting death boxes or supply drops", tag: "br" },
+            { text: "Buying guns in a pre-round shop window", tag: "tactical" }, { text: "Selecting dialogue choices for lore", tag: "story" },
+            { text: "Stacking random items for crazy synergy", tag: "roguelike" }, { text: "Holding a defensive angle with crosshairs", tag: "tactical" },
+            { text: "Using flashlights, cameras, and horror tools", tag: "horror" }, { text: "Executing frame-perfect inputs/combos", tag: "fighting" },
+            { text: "Staring at spreadsheet numbers & maps", tag: "strategy" }
+        ]
+    },
+    {
+        q: "What kind of world map layout do you prefer?",
+        options: [
+            { text: "Massive open-world with total freedom", tag: "open-world" }, { text: "Infinite sandbox where I generate things", tag: "sandbox" },
+            { text: "Small, compact round-based arenas", tag: "multiplayer" }, { text: "Procedural dungeon rooms that reset", tag: "roguelike" },
+            { text: "A tiny farm plot I can fully decorate", tag: "cozy" }, { text: "Linear story levels linked by cutscenes", tag: "story" },
+            { text: "A massive tactical battle royale map", tag: "br" }, { text: "A giant world map showing countries/units", tag: "strategy" },
+            { text: "Dark, terrifying corridors and hallways", tag: "horror" }, { text: "A classic side-scrolling 2D map layout", tag: "pixel" },
+            { text: "Anime world with bright vibrant colors", tag: "anime" }, { text: "A literal city that I am zoning/building", tag: "building" },
+            { text: "Fantasy realms with castles and monsters", tag: "fantasy" }, { text: "Futuristic neon cities and tech hubs", tag: "sci-fi" },
+            { text: "A simple 1v1 screen arena layout", tag: "fighting" }
+        ]
+    },
+    {
+        q: "What is your relationship with in-game difficulty?",
+        options: [
+            { text: "Brutal difficulty loops (Souls-like style)", tag: "brutal" }, { text: "Zero threat, cozy, pure meditation", tag: "chill" },
+            { text: "Competitive matchmaking sweat lords", tag: "sweaty" }, { text: "Standard campaign scaling for plot", tag: "story" },
+            { text: "Permadeath where one error wipes a run", tag: "roguelike" }, { text: "Complex econ systems that hurt your brain", tag: "strategy" },
+            { text: "Stealth tactics where alarms mean death", tag: "tactical" }, { text: "Casual minigames with no real loss", tag: "casual" },
+            { text: "Grinding same bosses for 1% drop rates", tag: "rpg" }, { text: "Jump scares and heart-rate testing panic", tag: "horror" },
+            { text: "Learning frame data and match-up combos", tag: "fighting" }, { text: "Surviving hunger, thirst, and base raids", tag: "survival" },
+            { text: "Figuring out complex brain-melting puzzles", tag: "indie" }, { text: "Casual physics and messing around", tag: "sandbox" },
+            { text: "Nintendo-hard but friendly styling", tag: "nintendo" }
+        ]
+    },
+    {
+        q: "Which specific theme matches your profile aesthetic?",
+        options: [
+            { text: "High-Fantasy, dragons, knights, magic", tag: "fantasy" }, { text: "Sci-Fi, spaceships, future implants", tag: "sci-fi" },
+            { text: "Modern real world cities and firearms", tag: "modern" }, { text: "Historical warfare or ancient legends", tag: "historical" },
+            { text: "Anime characters and stylized cel-shading", tag: "anime" }, { text: "Retro pixel art and indie passion loops", tag: "pixel" },
+            { text: "Dark horror, blood, and creepy vibes", tag: "horror" }, { text: "Cute animals, village life, and farming", tag: "cozy" },
+            { text: "Grim, post-apocalyptic, ruined structures", tag: "survival" }, { text: "Criminal syndicates and heist mechanics", tag: "crime" },
+            { text: "Superhero, high mobility comic actions", tag: "superhero" }, { text: "Industrial setups, conveyor belts, factory", tag: "building" },
+            { text: "Clean tactical esports presentation", tag: "tactical" }, { text: "Blocky, creative voxel textures", tag: "sandbox" },
+            { text: "Card battle decks and tabletop rule sets", tag: "turn-based" }
+        ]
+    },
+    {
+        q: "What is your favorite type of core progression loop?",
+        options: [
+            { text: "Leveling up and checking stat margins", tag: "rpg" }, { text: "Upgrading your base or automation system", tag: "building" },
+            { text: "Climbing Elo ranks from Bronze to Radiant", tag: "sweaty" }, { text: "Gathering resources to craft better gear", tag: "survival" },
+            { text: "Unlocking permanent meta upgrades across deaths", tag: "roguelike" }, { text: "Watching a deep cinematic narrative wrap up", tag: "story" },
+            { text: "Decorating your layout and making it look good", tag: "cozy" }, { text: "Mastering complex movement physics inputs", tag: "competitive" },
+            { text: "Collecting custom gacha characters on banners", tag: "gacha" }, { text: "Conquering territories turn by turn", tag: "strategy" },
+            { text: "Learning to read and counter player actions", tag: "fighting" }, { text: "Completing puzzles with unique mechanics", tag: "indie" },
+            { text: "Farming gold to buy better guns next round", tag: "tactical" }, { text: "Surviving the night with group friends", tag: "multiplayer" },
+            { text: "Collecting badges and hidden items in worlds", tag: "nintendo" }
+        ]
+    },
+    {
+        q: "Choose a mechanical interaction you love doing:",
+        options: [
+            { text: "Landing perfect headshots with sniper clicks", tag: "fps" }, { text: "Parrying or dodging right before an attack", tag: "brutal" },
+            { text: "Automating factory lines or resource outputs", tag: "building" }, { text: "Crafting a massive chest sorting inventory", tag: "sandbox" },
+            { text: "Setting up tactical smoke/utility lineups", tag: "tactical" }, { text: "Rolling dice or managing turn phases", tag: "turn-based" },
+            { text: "Watering crops and fishing in small ponds", tag: "farming" }, { text: "Wall-jumping, sliding, and fast movement", tag: "br" },
+            { text: "Stringing 10-hit juggles or combos together", tag: "fighting" }, { text: "Running away from monsters without weapons", tag: "horror" },
+            { text: "Browsing extensive stat screens and charts", tag: "strategy" }, { text: "Swapping out character gear loadouts", tag: "rpg" },
+            { text: "Exploring map fog to uncover hidden lore", tag: "open-world" }, { text: "Flying vehicles or aerial drift physics", tag: "cars" },
+            { text: "Playing custom user-made obstacle maps", tag: "multiplayer" }
+        ]
+    },
+    {
+        q: "What type of developer or platform identity fits?",
+        options: [
+            { text: "Small indie studio with incredible designs", tag: "indie" }, { text: "Nintendo polished first-party exclusivity", tag: "nintendo" },
+            { text: "Massive AAA blockbuster live-service loops", tag: "multiplayer" }, { text: "PC-centric hardcore tactical setups", tag: "pc" },
+            { text: "Old school legendary classic franchise", tag: "classic" }, { text: "FromSoftware brutal masterwork entries", tag: "brutal" },
+            { text: "Massive open-world crime simulators", tag: "crime" }, { text: "Hoarding items inside classic retro titles", tag: "pixel" },
+            { text: "Anime-centric massive budget operations", tag: "anime" }, { text: "Sony interactive cinematic story masterpieces", tag: "story" },
+            { text: "Co-op horror map developers", tag: "horror" }, { text: "Esports tournament scene giants", tag: "sweaty" },
+            { text: "Sandbox frameworks with infinite mini-games", tag: "casual" }, { text: "Turn-based strategy tabletop adaptions", tag: "turn-based" },
+            { text: "Life simulator systems and design suites", tag: "cozy" }
+        ]
+    },
+    {
+        q: "What is your ultimate standard for combat pacing?",
+        options: [
+            { text: "Lightning fast, split-second TTK shots", tag: "fps" }, { text: "Slow, methodical, stamina-tracked strikes", tag: "brutal" },
+            { text: "Completely turn-based where I can pause", tag: "turn-based" }, { text: "Real-time action commands with flashy moves", tag: "rpg" },
+            { text: "No combat at all, pure pacifist building", tag: "cozy" }, { text: "Isometric top-down chaotic ability spamming", tag: "clicker" },
+            { text: "Wave defense against giant target swarms", tag: "multiplayer" }, { text: "Third-person gunplay with cover mechanics", tag: "guns" },
+            { text: "Fighting against environment / survival elements", tag: "survival" }, { text: "Intense 1v1 footsies and health-bar duels", tag: "fighting" },
+            { text: "Dropping down structures to block gunfire", tag: "building" }, { text: "Baiting out killers in asymmetric loops", tag: "horror" },
+            { text: "Sending whole armies to clash on battlefields", tag: "strategy" }, { text: "Hack-and-slash clearing of room setups", tag: "roguelike" },
+            { text: "Melee parries using specific shield timing", tag: "swords" }
+        ]
+    },
+    {
+        q: "How do you feel about playing with other humans?",
+        options: [
+            { text: "I only play solo offline adventures", tag: "singleplayer" }, { text: "Hardcore 5v5 team matchmaking rank loops", tag: "sweaty" },
+            { text: "Casual sandbox lobbies with massive crowds", tag: "multiplayer" }, { text: "Co-op survival with 2-4 close friends", tag: "co-op" },
+            { text: "Asymmetric multiplayer (1 killer vs 4 targets)", tag: "horror" }, { text: "MMORPG guilds, raiding, and social hubs", tag: "rpg" },
+            { text: "1v1 competitive arena duels exclusively", tag: "fighting" }, { text: "Trading items and visiting friend islands", tag: "cozy" },
+            { text: "Proximity chat screaming in horror setups", tag: "horror" }, { text: "Dropping solo into a 100-player lobby", tag: "br" },
+            { text: "Co-op shooting against waves of enemies", tag: "fps" }, { text: "Sharing creations / blueprints online", tag: "building" },
+            { text: "Turn-based multiplayer strategy matches", tag: "strategy" }, { text: "Couch co-op party setups with mini-games", tag: "casual" }, { text: "I look up optimal builds from communities", tag: "sweaty" }
+        ]
+    },
+    {
+        q: "What inventory or crafting system makes you feel at home?",
+        options: [
+            { text: "Mining base minerals and crafting blocks", tag: "building" }, { text: "Looting colorful tier colors (Gray to Gold)", tag: "br" },
+            { text: "Managing extreme weight grids and values", tag: "rpg" }, { text: "No item management, just select active weapon", tag: "fps" },
+            { text: "Sorting infinite chest storage spaces", tag: "sandbox" }, { text: "Choosing temporary boons inside unique runs", tag: "roguelike" },
+            { text: "Organizing seed inventory and crop storage", tag: "farming" }, { text: "Upgrading your core gun parts and scopes", tag: "guns" },
+            { text: "Equipping custom swords, armor, and rings", tag: "swords" }, { text: "Drafting active ability or utility cards", tag: "turn-based" },
+            { text: "Extracting military loot to secure stash boxes", tag: "tactical" }, { text: "Collecting building components for towns", tag: "strategy" },
+            { text: "Hoarding healing serums and battery cells", tag: "horror" }, { text: "Trading custom skins on marketplace platforms", tag: "multiplayer" }, { text: "No items, just specialized ability tracks", tag: "fighting" }
+        ]
+    },
+    {
+        q: "What does your absolute favorite gameplay loop look like?",
+        options: [
+            { text: "Spawn, loot up, rotate, win the circle", tag: "br" }, { text: "Die, talk to NPCs, upgrade mirror, repeat", tag: "roguelike" },
+            { text: "Buy weapons, execute bomb site, defuse/plant", tag: "tactical" }, { text: "Mine blocks, craft tools, build massive base", tag: "building" },
+            { text: "Wake up, clean farm, check town characters", tag: "cozy" }, { text: "Accept quest, clear dungeon, optimize stats", tag: "rpg" },
+            { text: "Queue up, pick hero, push objective line", tag: "hero" }, { text: "Spawn car, intercept ball, hit aerial aerials", tag: "cars" },
+            { text: "Select nation, click next turn, conquer land", tag: "strategy" }, { text: "Enter room, gather data, identify ghost/monster", tag: "horror" },
+            { text: "Walk into arena, read opponent frame, execute combo", tag: "fighting" }, { text: "Follow waypoint, activate eagle vision, fight camp", tag: "open-world" },
+            { text: "Roam wastes, shoot monsters, build small camp", tag: "survival" }, { text: "Boot up user tycoon, farm currency pass, buy hats", tag: "casual" }, { text: "Fight giant beast, skin parts, forge weapon", tag: "swords" }
+        ]
+    },
+    {
+        q: "Pick a secondary design element that locks down your choice:",
+        options: [
+            { text: "Music scores that hit hard or emotional plots", tag: "story" }, { text: "Cybernetic skill options and tech themes", tag: "sci-fi" },
+            { text: "Brutal boss doors with fog gates", tag: "brutal" }, { text: "Ancient lore ruins or historical artifacts", tag: "historical" },
+            { text: "Cell-shaded art style or visual novels", tag: "anime" }, { text: "Pixel art with massive weapon rosters", tag: "pixel" },
+            { text: "Dark environments needing a flashlight tool", tag: "horror" }, { text: "Cute animal townsfolk or custom designs", tag: "cozy" },
+            { text: "Stealing sports cars or committing crimes", tag: "crime" }, { text: "Swinging through massive metropolitan cities", tag: "superhero" },
+            { text: "Infinite automated factory grid networks", tag: "building" }, { text: "Competitive esports scenes with big stages", tag: "sweaty" },
+            { text: "User generated game hubs with block layouts", tag: "casual" }, { text: "Rolling for limited gacha item profiles", tag: "gacha" }, { text: "Solving portal or laser redirection maps", tag: "indie" }
+        ]
+    },
+    {
+        q: "Final baseline question: What is the most iconic visual you see?",
+        options: [
+            { text: "A blocky green landscape with exploding monsters", tag: "minecraft" }, { text: "A modern city map with a multi-star police tracker", tag: "crime" },
+            { text: "A paraglider soaring towards a fantasy castle", tag: "nintendo" }, { text: "A golden glowing checkpoint in a brutal ruin", tag: "brutal" },
+            { text: "A tactical crosshair smoke smoke line alignment", tag: "tactical" }, { text: "A custom battle bus dropping players down", tag: "br" },
+            { text: "A retro farmhouse grid surrounded by crops", tag: "farming" }, { text: "A top-down lane layout with enemy towers", tag: "moba" },
+            { text: "A neon hud with cyber upgrade options", tag: "sci-fi" }, { text: "A deep conversation menu affecting the plot", tag: "story" },
+            { text: "A character select screen filled with anime styles", tag: "anime" }, { text: "A dark flashlight view inside an empty house", tag: "horror" },
+            { text: "A 2D landscape filled with ores and pixel graphics", tag: "pixel" }, { text: "A massive factory line pumping out automation", tag: "building" }, { text: "Two health bars at the top of a 1v1 fight scene", tag: "fighting" }
+        ]
+    }
+];
+
+let activePool = [];
+let currentQuestionIndex = 0;
+let gameScores = {};
+
+function startGame() {
+    activePool = [...gamesDatabase];
+    currentQuestionIndex = 0;
+    gameScores = {};
+    gamesDatabase.forEach(g => gameScores[g.name] = 0);
+    showQuestion();
+}
+
+function showQuestion() {
+    const card = document.getElementById('game-card');
+    
+    if (currentQuestionIndex >= questions.length || activePool.length <= 1) {
+        showResult();
+        return;
+    }
+
+    const qData = questions[currentQuestionIndex];
+    let optionsHtml = '';
+    
+    qData.options.forEach(opt => {
+        optionsHtml += `<button onclick="submitAnswer('${opt.tag}')">${opt.text}</button>`;
+    });
+
+    card.innerHTML = `
+        <div class="progress">Question ${currentQuestionIndex + 1} of ${questions.length}</div>
+        <div class="question">${qData.q}</div>
+        <div class="options-grid">
+            ${optionsHtml}
+        </div>
+        <div class="tracker">Isolating target matrix... candidates left: ${activePool.length}</div>
+    `;
+}
+
+function submitAnswer(chosenTag) {
+    activePool.forEach(game => {
+        if (game.tags.includes(chosenTag)) {
+            gameScores[game.name] += 25;
+        }
+    });
+
+    let filtered = activePool.filter(game => game.tags.includes(chosenTag));
+    if (filtered.length > 0) {
+        activePool = filtered;
+    }
+
+    currentQuestionIndex++;
+    showQuestion();
+}
+
+function showResult() {
+    const card = document.getElementById('game-card');
+    
+    let highestScore = -1;
+    let guessedGame = "";
+
+    activePool.forEach(game => {
+        if (gameScores[game.name] > highestScore) {
+            highestScore = gameScores[game.name];
+            guessedGame = game.name;
+        }
+    });
+
+    if (!guessedGame) {
+        guessedGame = gamesDatabase[Math.floor(Math.random() * gamesDatabase.length)].name;
+    }
+
+    card.innerHTML = `
+        <h1>Matrix Scan Complete</h1>
+        <p style="font-size: 1.5rem; margin-top: 25px;">I think your favorite game is:</p>
+        <div class="game-display">${guessedGame}</div>
+        <p style="font-size: 1.6rem; margin-bottom: 35px; font-weight: bold; text-transform: uppercase; color: #ff007f;">Am I right?</p>
+        <div class="options-grid" style="grid-template-columns: 1fr 1fr; max-width: 500px; margin: 0 auto;">
+            <button class="btn-right" onclick="handleFeedback(true)">✔️ Yep, nailed it!</button>
+            <button class="btn-wrong" onclick="handleFeedback(false)">❌ Wrong, try again</button>
+        </div>
+    `;
+}
+
+function handleFeedback(isCorrect) {
+    const card = document.getElementById('game-card');
+    if (isCorrect) {
+        card.innerHTML = `
+            <h1 style="color: #00ffcc;">GG WP!</h1>
+            <p style="font-size: 1.4rem; margin: 35px 0;">The oracle successfully isolated your exact gaming profile layout.</p>
+            <button class="btn-center" onclick="startGame()">Play Again</button>
+        `;
+    } else {
+        card.innerHTML = `
+            <h1 style="color: #ff3333;">F in Chat</h1>
+            <p style="font-size: 1.4rem; margin: 35px 0;">Algorithm recalibration needed. Let's trace your profile path again.</p>
+            <button class="btn-center" onclick="startGame()">Reboot Matrix</button>
+        `;
+    }
+}
+</script>
+
+</body>
+</html>
+
